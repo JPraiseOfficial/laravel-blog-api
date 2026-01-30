@@ -1,11 +1,13 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
+    "name": "jpraiseofficial/blog-api",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "A RESTful Blog API supporting nested comments and user likes to test my skills in laravel.",
     "keywords": [
         "laravel",
-        "framework"
+        "framework",
+        "blog",
+        "api"
     ],
     "license": "MIT",
     "require": {
@@ -17,7 +19,7 @@
     "require-dev": {
         "fakerphp/faker": "^1.23",
         "laravel/boost": "^2.0",
-        "laravel/pail": "^1.2.2",
+        "laravel/pail": "^1.2",
         "laravel/pint": "^1.24",
         "laravel/sail": "^1.41",
         "mockery/mockery": "^1.6",
