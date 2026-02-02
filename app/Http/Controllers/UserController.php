@@ -3,52 +3,56 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\RegisterUserRequest;
+use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(RegisterUserRequest $request)
+    // creates a new user
+    public function registerUser(RegisterUserRequest $request)
     {
         $userData = $request->validated();
 
-        User::create($userData);
+        $user = User::create($userData);
 
-        return response()->json(['message' => 'User Registered Successfully']);
+        return response()->json([
+            'message' => 'User Registered Successfully',
+            'user' => $user,
+        ]);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    // Get authenticated user's profile or any other user's profile
+    public function profile(?string $id = null)
     {
-        //
+        $id = $id ?? auth()->id();
+        $user = User::find($id);
+
+        return response()->json(['user' => $user]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    // updates users profile
+    public function update(UpdateUserRequest $request)
     {
-        //
+        $user = $request->user();
+        $user->update($request->validated());
+
+        return response()->json([
+            'message' => 'User updated successfully',
+            'user' => $user,
+        ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy(Request $request)
     {
-        //
+        $request->user()->tokens()->delete();
+        $request->user()->delete();
+
+        return response()->json(['message' => 'User deleted successfully']);
     }
 }

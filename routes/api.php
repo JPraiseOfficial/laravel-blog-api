@@ -1,13 +1,21 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-// Route::get('/user', function (Request $request) {
-//     return $request->user();
-// })->middleware('auth:sanctum');
+// AUTH ROUTES
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
+Route::post('/change-password', [AuthController::class, 'changePassword'])->middleware('auth:sanctum');
 
+// USER ROUTES
 Route::controller(UserController::class)->group(function () {
-    Route::post('/register', 'store');
+    Route::post('/register', 'registerUser');
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/user', 'profile');
+        Route::get('/user/{id}', 'profile');
+        Route::patch('/user/update', 'update');
+        Route::delete('/user/delete', 'destroy');
+    });
 });
