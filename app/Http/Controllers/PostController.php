@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePostRequest;
 use App\Models\Post;
+use App\Models\User;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class PostController extends Controller
@@ -59,5 +60,23 @@ class PostController extends Controller
         $post->delete();
 
         return response()->json(['message' => 'Post deleted successfully']);
+    }
+
+    public function getOtherUsersPosts(User $user)
+    {
+        return response()->json([
+            $user->posts()
+                ->with('user')
+                ->latest()
+                ->paginate(10)]);
+    }
+
+    public function getLatestPosts()
+    {
+        $posts = Post::with('user')
+            ->latest()
+            ->paginate(10);
+
+        return response()->json($posts);
     }
 }

@@ -27,3 +27,7 @@ Route::controller(UserController::class)->group(function () {
 
 // POST ROUTES
 Route::middleware('auth:sanctum')->apiResource('posts', PostController::class);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/{user}/posts', [PostController::class, 'getOtherUsersPosts']);
+    Route::get('/feed', [PostController::class, 'getLatestPosts']);
+});
