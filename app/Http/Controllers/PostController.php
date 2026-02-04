@@ -37,6 +37,11 @@ class PostController extends Controller
 
     public function show(Post $post)
     {
+        // Load comments and the user who wrote each comment
+        $post->load(['comments' => function ($query) {
+            $query->latest(); // Show newest comments at the top
+        }, 'comments.user:id,name,username']);
+
         return response()->json([
             'post' => $post,
         ]);

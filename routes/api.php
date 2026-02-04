@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -31,3 +32,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/{user}/posts', [PostController::class, 'getOtherUsersPosts']);
     Route::get('/feed', [PostController::class, 'getLatestPosts']);
 });
+
+// COMMENT ROUTES
+Route::middleware('auth:sanctum')->apiResource('comments', CommentController::class);
