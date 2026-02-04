@@ -11,10 +11,12 @@ class PostController extends Controller
 {
     use AuthorizesRequests;
 
+    // Returns all current user's posts
     public function index()
     {
         $posts = request()->user()->posts()
-            ->with('user')
+            ->with(['comments', 'likes'])
+            ->withCount(['comments', 'likes'])
             ->latest()
             ->paginate(10);
 
@@ -40,7 +42,7 @@ class PostController extends Controller
         // Load comments and the user who wrote each comment
         $post->load(['comments' => function ($query) {
             $query->latest(); // Show newest comments at the top
-        }, 'comments.user:id,name,username']);
+        }, 'comments.user:id,name,username', 'comments.likes', 'likes']);
 
         return response()->json([
             'post' => $post,
@@ -71,14 +73,16 @@ class PostController extends Controller
     {
         return response()->json([
             $user->posts()
-                ->with('user')
+                ->with(['user', 'comments', 'likes'])
+                ->withCount(['comments', 'likes'])
                 ->latest()
                 ->paginate(10)]);
     }
 
     public function getLatestPosts()
     {
-        $posts = Post::with('user')
+        $posts = Post::with(['user', 'comments', 'likes'])
+            ->withCount(['comments', 'likes'])
             ->latest()
             ->paginate(10);
 

@@ -14,6 +14,7 @@ class CommentController extends Controller
     {
         $comments = Comment::where('user_id', request()->user()->id)
             ->with(['post:id,user_id,title,body', 'post.user:id,name,username'])
+            ->withCount(['likes'])
             ->latest()
             ->paginate(10);
 
@@ -45,7 +46,7 @@ class CommentController extends Controller
     public function show(Comment $comment)
     {
         return response()->json([
-            'comment' => $comment->load(['user', 'post']),
+            'comment' => $comment->load(['likes', 'user', 'post']),
         ]);
     }
 
