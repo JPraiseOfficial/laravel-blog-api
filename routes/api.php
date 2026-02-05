@@ -7,7 +7,7 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-// AUTH ROUTES
+// ====== AUTH ROUTES =========
 Route::controller(AuthController::class)->group(function () {
     Route::post('/login', 'login');
     Route::middleware('auth:sanctum')->group(function () {
@@ -15,14 +15,24 @@ Route::controller(AuthController::class)->group(function () {
         Route::post('/change-password', 'changePassword');
     });
 });
-
-// EMAIL VERIFICATION ROUTES
 // Verify email handler
 Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])->middleware(['auth:sanctum', 'signed'])->name('verification.verify');
 
 // Send Email Verification Link
 Route::post('/email/sendVerificationLink', [AuthController::class, 'sendEmailVerification'])->middleware(['auth:sanctum', 'throttle:6,1'])->name('verification.send');
 
+Route::middleware('guest')->controller(AuthController::class)->group(function () {
+    // Forgot Password
+    Route::post('/forgot-password', 'forgotPassword')->name('password.email');
+    // Reset Password Frontend
+    Route::get('/reset-password/{token}', 'frontendResetPasswordRedirect')->name('password.reset');
+    // Reset Password Backend
+    Route::post('/reset-password', 'resetPassword')->name('password.update');
+});
+
+/*
+========================================
+*/
 // USER ROUTES
 Route::controller(UserController::class)->group(function () {
     Route::post('/register', 'registerUser');
