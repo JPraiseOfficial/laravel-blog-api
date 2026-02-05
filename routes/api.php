@@ -16,6 +16,13 @@ Route::controller(AuthController::class)->group(function () {
     });
 });
 
+// EMAIL VERIFICATION ROUTES
+// Verify email handler
+Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])->middleware(['auth:sanctum', 'signed'])->name('verification.verify');
+
+// Send Email Verification Link
+Route::post('/email/sendVerificationLink', [AuthController::class, 'sendEmailVerification'])->middleware(['auth:sanctum', 'throttle:6,1'])->name('verification.send');
+
 // USER ROUTES
 Route::controller(UserController::class)->group(function () {
     Route::post('/register', 'registerUser');

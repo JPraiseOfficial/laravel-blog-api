@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
@@ -59,5 +60,20 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Password changed successfully.',
         ]);
+    }
+
+    public function verifyEmail(EmailVerificationRequest $request)
+    {
+        $request->fulfill();
+
+        return response()->json(['message' => 'Email verified successfully!']);
+    }
+
+    public function sendEmailVerification(Request $request)
+    {
+        $request->user()->sendEmailVerificationNotification();
+
+        return response()->json(['message' => 'Email Verification link sent!']);
+
     }
 }

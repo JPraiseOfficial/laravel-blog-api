@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\RegisterUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
@@ -21,8 +22,10 @@ class UserController extends Controller
 
         $user = User::create($userData);
 
+        event(new Registered($user));
+
         return response()->json([
-            'message' => 'User Registered Successfully',
+            'message' => 'User Registered Successfully. An email verification mail has been sent to your inbox',
             'user' => $user,
         ]);
     }
