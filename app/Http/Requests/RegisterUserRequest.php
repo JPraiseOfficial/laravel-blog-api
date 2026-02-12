@@ -30,7 +30,7 @@ class RegisterUserRequest extends FormRequest
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'confirmed', Password::min(6)->letters()->numbers()->symbols()],
             'bio' => ['required', 'string', 'max:500'],
-            'gender' => ['required', 'string', 'in:male,female,others'],
+            'gender' => ['required', 'string', 'in:male,female'],
             'profile_picture' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
         ];
     }
@@ -38,7 +38,7 @@ class RegisterUserRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'gender.in' => 'Please, select male, female or others',
+            'gender.in' => 'Please, select male or female',
         ];
     }
 }
