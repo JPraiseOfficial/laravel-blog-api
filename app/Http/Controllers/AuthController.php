@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ResetPasswordRequest;
+use App\Mail\ResetPasswordLink;
 use App\Models\PasswordResetToken;
 use App\Models\User;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password as PasswordRule;
 
@@ -83,9 +85,9 @@ class AuthController extends Controller
     {
         $request->validate(['email' => ['required', 'email']]);
 
-        $existingEmail = User::where('email', $request->email)->first();
+        $user = User::where('email', $request->email)->first();
 
-        if (! $existingEmail) {
+        if (! $user) {
             return response()->json(['message' => 'Email does not exist'], 404);
         }
 
@@ -101,12 +103,13 @@ class AuthController extends Controller
             'created_at' => now(),
         ]);
 
-        $frontendUrl = env('APP_URL').'/reset-password?token='.$token.'&email='.$request->email;
+        $resetLink = env('APP_URL').'/reset-password?token='.$token.'&email='.$request->email;
+
+        Mail::to($user)->send(new ResetPasswordLink($resetLink));
 
         return response()->json(
             [
-                'message' => 'Password Reset link has been sent successfully',
-                'reset_link' => $frontendUrl,
+                'message' => 'Password Reset link has been sent to your mail',
             ],
             200
         );
