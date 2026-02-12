@@ -7,56 +7,87 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-// ====== AUTH ROUTES =========
+/*
+|--------------------------------------------------------------------------
+| Auth Routes
+|--------------------------------------------------------------------------
+*/
 Route::controller(AuthController::class)->group(function () {
+    // Public
+    Route::post('/register', 'register');
     Route::post('/login', 'login');
+
+    // Password Reset
+    Route::middleware('guest')->group(function () {
+        Route::post('/forgot-password', 'forgotPassword');
+        Route::get('/reset-password/{token}', 'frontendResetPasswordRedirect')->name('password.reset');
+        Route::post('/reset-password', 'resetPassword')->name('password.update');
+    });
+
+    // Email Verification
+    Route::get('/email/verify/{id}/{hash}', 'verifyEmail')
+        ->middleware(['auth:sanctum', 'signed'])
+        ->name('verification.verify');
+
+    Route::post('/email/sendVerificationLink', 'sendEmailVerification')
+        ->middleware(['auth:sanctum', 'throttle:6,1'])
+        ->name('verification.send');
+
+    // Authenticated
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', 'logout');
         Route::post('/change-password', 'changePassword');
     });
 });
-// Verify email handler
-Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])->middleware(['auth:sanctum', 'signed'])->name('verification.verify');
 
-// Send Email Verification Link
-Route::post('/email/sendVerificationLink', [AuthController::class, 'sendEmailVerification'])->middleware(['auth:sanctum', 'throttle:6,1'])->name('verification.send');
-
-Route::middleware('guest')->controller(AuthController::class)->group(function () {
-    // Forgot Password
-    Route::post('/forgot-password', 'forgotPassword');
-    // Reset Password Frontend
-    Route::get('/reset-password/{token}', 'frontendResetPasswordRedirect')->name('password.reset');
-    // Reset Password Backend
-    Route::post('/reset-password', 'resetPassword')->name('password.update');
+/*
+|--------------------------------------------------------------------------
+| User Routes
+|--------------------------------------------------------------------------
+*/
+Route::controller(UserController::class)->middleware('auth:sanctum')->group(function () {
+    Route::get('/user', 'profile');
+    Route::get('/user/{id}', 'profile');
+    Route::patch('/user', 'update');
+    Route::delete('/user', 'destroy');
 });
 
 /*
-========================================
+|--------------------------------------------------------------------------
+| Post Routes
+|--------------------------------------------------------------------------
 */
-// USER ROUTES
-Route::controller(UserController::class)->group(function () {
-    Route::post('/register', 'registerUser');
-    Route::middleware('auth:sanctum')->group(function () {
-        Route::get('/user', 'profile');
-        Route::get('/user/{id}', 'profile');
-        Route::patch('/user', 'update');
-        Route::delete('/user', 'destroy');
-    });
+Route::controller(PostController::class)->middleware('auth:sanctum')->group(function () {
+    // Resource Routes
+    Route::get('/posts', 'index');
+    Route::post('/posts', 'store');
+    Route::get('/posts/{post}', 'show');
+    Route::match(['put', 'patch'], '/posts/{post}', 'update');
+    Route::delete('/posts/{post}', 'destroy');
+
+    // Custom Post Routes
+    Route::get('/feed', 'getLatestPosts');
+    Route::get('/{user}/posts', 'getOtherUsersPosts');
 });
 
-// POST ROUTES
-Route::middleware('auth:sanctum')->apiResource('posts', PostController::class);
-Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/{user}/posts', [PostController::class, 'getOtherUsersPosts']);
-    Route::get('/feed', [PostController::class, 'getLatestPosts']);
+/*
+|--------------------------------------------------------------------------
+| Comment Routes
+|--------------------------------------------------------------------------
+*/
+Route::controller(CommentController::class)->middleware('auth:sanctum')->group(function () {
+    Route::get('/comments', 'index');
+    Route::post('/comments', 'store');
+    Route::get('/comments/{comment}', 'show');
+    Route::match(['put', 'patch'], '/comments/{comment}', 'update');
+    Route::delete('/comments/{comment}', 'destroy');
 });
 
-// COMMENT ROUTES
-Route::middleware('auth:sanctum')->apiResource('comments', CommentController::class);
-
-// LIKE ROUTE
-Route::middleware('auth:sanctum')->controller(LikeController::class)->group(function () {
+/*
+|--------------------------------------------------------------------------
+| Like Routes
+|--------------------------------------------------------------------------
+*/
+Route::controller(LikeController::class)->middleware('auth:sanctum')->group(function () {
     Route::post('/like-toggle', 'toggle');
-    // Route::get('/posts/create', 'create');
-    // Route::post('/posts', 'store');
 });

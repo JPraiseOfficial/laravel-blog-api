@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\RegisterUserRequest;
 use App\Http\Requests\ResetPasswordRequest;
 use App\Mail\ResetPasswordLink;
 use App\Models\PasswordResetToken;
 use App\Models\User;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -15,6 +17,21 @@ use Illuminate\Validation\Rules\Password as PasswordRule;
 
 class AuthController extends Controller
 {
+    // creates a new user
+    public function register(RegisterUserRequest $request)
+    {
+        $userData = $request->validated();
+
+        $user = User::create($userData);
+
+        event(new Registered($user));
+
+        return response()->json([
+            'message' => 'User Registered Successfully. An email verification mail has been sent to your inbox',
+            'user' => $user,
+        ]);
+    }
+
     public function login(Request $request)
     {
         $request->validate([

@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\RegisterUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
-use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
@@ -13,21 +11,6 @@ class UserController extends Controller
     public function index()
     {
         //
-    }
-
-    // creates a new user
-    public function registerUser(RegisterUserRequest $request)
-    {
-        $userData = $request->validated();
-
-        $user = User::create($userData);
-
-        event(new Registered($user));
-
-        return response()->json([
-            'message' => 'User Registered Successfully. An email verification mail has been sent to your inbox',
-            'user' => $user,
-        ]);
     }
 
     // Get authenticated user's profile or any other user's profile
