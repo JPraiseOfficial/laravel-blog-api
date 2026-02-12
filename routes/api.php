@@ -23,7 +23,7 @@ Route::post('/email/sendVerificationLink', [AuthController::class, 'sendEmailVer
 
 Route::middleware('guest')->controller(AuthController::class)->group(function () {
     // Forgot Password
-    Route::post('/forgot-password', 'forgotPassword')->name('password.email');
+    Route::post('/forgot-password', 'forgotPassword');
     // Reset Password Frontend
     Route::get('/reset-password/{token}', 'frontendResetPasswordRedirect')->name('password.reset');
     // Reset Password Backend
